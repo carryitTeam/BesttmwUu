@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.carryit.base.besttmwuu.dao.CashApplyDao">
+
+    <!--保存-->
+    <insert id="save">
+        insert into ims_ewei_shop_member_log(openid,type,logno,title,createtime,status,money)
+        values(#{openid},#{type},#{logno},#{title},#{createtime},#{status},#{money})
+    </insert>
+
+
+    <!--修改-->
+    <update id="update" >
+        update ims_ewei_shop_member_log
+        set status = #{status}
+        where id = #{id}
+    </update>
+
+    <!--查询最新的ID-->
+    <select id="findMaxId" resultType="int">
+        select max(id) from ims_ewei_shop_member_log
+
+    </select>
+
+    <!--提现数据-->
+    <select id="cashData" resultType="com.carryit.base.besttmwuu.entity.CashDataDTO">
+        SELECT
+        l.id,
+        m.uid,
+        m.avatar,
+        m.nickname,
+        l.createtime,
+        l.`status`,
+        l.money,
+        u.phone as mobile
+        FROM
+        ims_ewei_shop_member_log l
+        LEFT JOIN ims_ewei_shop_member m
+        LEFT JOIN ims_users u ON m.uid = u.uid ON l.openid = m.openid
+        WHERE
+        l.type = 1
+        <choose>
+            <when test="phone != null and phone != '' ">
+                and m.mobile = #{phone}
+            </when>
+        </choose>
+        limit #{page},#{limit}
+    </select>
+
+    <!--统计提现数-->
+    <select id="count" resultType="int">
+        SELECT count(*) from ims_ewei_shop_member_log l
+        LEFT JOIN ims_ewei_shop_member m
+        ON l.openid = m.openid
+        where l.type = 1
+        <choose>
+            <when test="phone != null and phone != '' ">
+                and m.mobile = #{phone}
+            </when>
+        </choose>
+    </select>
+</mapper>

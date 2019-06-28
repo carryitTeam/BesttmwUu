@@ -9,6 +9,7 @@ import com.carryit.base.besttmwuu.entity.*;
 import com.carryit.base.besttmwuu.service.*;
 import com.util.Log;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -40,9 +43,8 @@ public class CirclesController extends BaseController {
     @Autowired
     PraiseService praiseService;
 
-    private static String UU圈主 = "0";
-    private static String 副圈主 = "6";
-    private static String UC管理员 = "7";
+    private static final  String Fqz = "1";//副圈主
+    private static final  String UCgly = "2";//UU管理员
 
 
     @RequestMapping(value = "/getCircles", method = {RequestMethod.GET,
@@ -62,6 +64,7 @@ public class CirclesController extends BaseController {
 
     @Override
     public JSONObject runTask(String json, int cmd) {
+        //分红机制
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         //获取当前月第一天：
         Calendar c = Calendar.getInstance();
@@ -185,6 +188,11 @@ public class CirclesController extends BaseController {
                         boardList = boardFollowService.getBoardFollowByUId(_req.uid);
                     if(boardList!=null&&boardList.size()>0){
                         for (Board _bo:boardList) {
+
+                            if(_bo.getBanner()!=null){
+                                List<String> result = Arrays.asList(_bo.getBanner().split(","));
+                                _bo.setBannerList(result);
+                            }
                             boardListDTO.add(_bo);
                         }
                     }
@@ -207,7 +215,14 @@ public class CirclesController extends BaseController {
                             if (newboardList.size() > 10) {
                                 newboardList = newboardList.subList(0, 10);
                             }
+                            for (int i = 0; i < newboardList.size(); i++) {
+                                if(newboardList.get(i).getBanner()!=null){
+                                    List<String> result = Arrays.asList(newboardList.get(i).getBanner().split(","));
+                                    newboardList.get(i).setBannerList(result);
+                                }
+                            }
                         }
+
                     }
 
                 } catch (Exception e) {
@@ -219,14 +234,14 @@ public class CirclesController extends BaseController {
 
                 MemberLevel ml = p(json, MemberLevel.class);
                 try {
-                    if (ml != null && ml.getUid() != 0 && ml.getLevel() != 0) {
+                    if (ml != null && ml.getUid() != 0 && ml.getLevel() != null) {
                         //根据uid查询该用户的主圈子
                         Member mb = memberService.getMemberById(ml.getUid());
                         if (mb != null && mb.getZhuquanzi() != null) {
-                            //如果等级level为副圈主 ="6"，查找该圈子副圈主的个数
-                            if (Integer.parseInt(副圈主) == ml.getLevel()) {
+                            //如果等级level为副圈主 ="1"，查找该圈子副圈主的个数
+                            if (Fqz.equals(ml.getLevel())) {
 
-                                int fuCount = memberService.getMemberByUIdAndLevel(mb.getZhuquanzi(), Integer.parseInt(副圈主));
+                                int fuCount = memberService.getMemberByUIdAndLevel(mb.getZhuquanzi(), Fqz);
                                 if (fuCount >= 10) {
                                     return faild("副圈主名额已满", false);
                                 } else {
@@ -235,21 +250,23 @@ public class CirclesController extends BaseController {
                                     return doObjRespSuccess("成功");
                                 }
 
-                            } else if (Integer.parseInt(UC管理员) == ml.getLevel()) {
-                                //如果等级level为UC管理员 ="7"
-                                int fuCount = memberService.getMemberByUIdAndLevel(mb.getZhuquanzi(), Integer.parseInt(UC管理员));
+                            } else if (UCgly.equals(ml.getLevel())) {
+                                //如果等级level为UC管理员 ="2"
+                                int fuCount = memberService.getMemberByUIdAndLevel(mb.getZhuquanzi(), ml.getLevel());
                                 if (fuCount >= 50) {
-                                    return faild("UC管理员名额已满", false);
+                                    return faild("UU管理员名额已满", false);
                                 } else {
                                     //更新用户为UC管理员
                                     memberService.updateMemberByUIdAndLevel(ml.getUid(), ml.getLevel());
                                     return doObjRespSuccess("成功");
                                 }
+                            }else {
+                                return faild("数据异常(等级选择错误)", false);
                             }
 
 
                         } else {
-                            return faild("数据异常（用户没有绑定主圈子）~", false);
+                            return faild("数据异常（用户没有购买主圈子）~", false);
                         }
                     } else {
                         return faild("参数异常~", false);
@@ -366,7 +383,15 @@ public class CirclesController extends BaseController {
                     BoardReq req = p(json, BoardReq.class);
                     if (req != null) {
                         boa = boardService.getBoardById(req.bid);
+                        if(StringUtils.isNotBlank(boa.getCulturewall())){
+                            String emojiStr = URLDecoder.decode(boa.getCulturewall(), "utf-8");
+                            boa.setCulturewall(emojiStr);
+                        }
                         boardDetail.setBoard(boa);
+                        if(boa!=null&&boa.getAdvertisement()!=null){
+                            List<String> result = Arrays.asList(boa.getAdvertisement().split(","));
+                            boardDetail.setAdvertisement(result);
+                        }
                         nbf = boardFollowService.getBoardByUid(req.uid, req.bid);// 查询该用户是否关注该圈子
                         if (nbf != null) {
                             boardDetail.setFollow("1");
@@ -396,24 +421,43 @@ public class CirclesController extends BaseController {
                   if(postList!=null&&postList.size()>0){
                      for (Post post:postList) {
                          TrendsData trendsData = new TrendsData();
-
+                         if(post.getContent()!=null){
+                             post.setContent(URLDecoder.decode(post.getContent(), "utf-8"));
+                         }
                          //根据动态查评论
                          List<Post> commentList = postService.getcommentBypid(post.getId());
+                         if(commentList!=null&&commentList.size()>0){
+                             for (Post po:commentList) {
+                                 po.setContent(URLDecoder.decode(po.getContent(), "utf-8"));
+                             }
+                         }
                          //查找点赞数
                          long praiseCount  = praiseService.getPraiseCount(post.getId());
                          //点赞头像
                          List<String> avatarList = praiseService.getPraiseImage(post.getId());
+                         if(post.getCreatetime()!=0){
+                             SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                             String date = fm.format(new Date(post.getCreatetime()));
+                             post.setCreateDate(date);
+                         }
+                         if(post.getImage()!=null){
+                             List<String> result = Arrays.asList(post.getImage().split(","));
+                             post.setImageList(result);
+                         }
+                         //查询该用户是否点赞
+                         TPraise pr = praiseService.getPraise(boardTopic.getUid(),post.getId());
+                         if(pr==null){
+                             post.setFabulous(0);//没有点赞
+                         }else {
+                             post.setFabulous(1);//已经点赞
+                         }
 
                          trendsData.setPost(post);
                          trendsData.setCommentList(commentList);
                          trendsData.setPraiseCount(praiseCount);
                          trendsData.setAvatarList(avatarList);
                          TrendsDataList.add(trendsData);
-                         if(post.getCreatetime()!=0){
-                             SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
-                             String date = fm.format(new Date(post.getCreatetime()));
-                             post.setCreateDate(date);
-                         }
+
                      }
                  }
                   topicCount =  boardFollowService.getAllBoardTopicCount(boardTopic.getBid());
@@ -448,8 +492,18 @@ public class CirclesController extends BaseController {
                                 for (Post post:postList) {
                                     TrendsData newTrendsData = new TrendsData();
 
+                                    if(post.getContent()!=null){
+                                        post.setContent(URLDecoder.decode(post.getContent(), "utf-8"));
+                                    }
                                     //根据动态查评论
                                     List<Post> newCommentList = postService.getcommentBypid(post.getId());
+
+                                    if(newCommentList!=null&&newCommentList.size()>0){
+                                        for (Post po:newCommentList) {
+                                            po.setContent(URLDecoder.decode(po.getContent(), "utf-8"));
+                                        }
+                                    }
+
                                     //查找点赞数
                                     long newPraiseCount  = praiseService.getPraiseCount(post.getId());
                                     //点赞头像
@@ -470,6 +524,10 @@ public class CirclesController extends BaseController {
                                         SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
                                         String date = fm.format(new Date(post.getCreatetime()));
                                         post.setCreateDate(date);
+                                    }
+                                    if(post.getImage()!=null){
+                                        List<String> result = Arrays.asList(post.getImage().split(","));
+                                        post.setImageList(result);
                                     }
                                 }
                             }
@@ -493,7 +551,59 @@ public class CirclesController extends BaseController {
                 e.printStackTrace();
                 return faild("失败~",false);
             }
+        case 13:
+                List<Board> _boardList = new ArrayList<>();
+                BoardReq _newreq = p(json, BoardReq.class);
+                try {
+                    if (_newreq != null) {
+                        _boardList = boardFollowService.getBoardFollowByUId(_newreq.uid);
+                        if(_boardList!=null&&_boardList.size()>0){
+                            for (Board _bo:_boardList) {
+                                if(_bo.getBanner()!=null){
+                                    List<String> result = Arrays.asList(_bo.getBanner().split(","));
+                                    _bo.setBannerList(result);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return faild("失败~",false);
+                }
+                return doObjResp(_boardList);
+            case 14:
+                try{
+                    Culturewall culturewall = p(json, Culturewall.class);
+                    if (culturewall != null) {
+                        String encodeCulturewall = URLEncoder.encode(culturewall.getCulturewall(), "utf-8");
+                        culturewall.setCulturewall(encodeCulturewall);
+                        circlesService.updateCulturewallByBid(culturewall);
+                        return doObjRespSuccess("更新成功");
+                    }else {
+                        return faild("参数缺失~",false);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return faild("失败~",false);
+                }
 
+            case 15:
+                try{
+                    BoardManage _bm = p(json, BoardManage.class);
+                    if (_bm != null) {
+                        Member member = memberService.getMember(_bm.getUid(), _bm.getBid());
+                        if(member!=null&&member.getLevel().equals("0")){
+                            return doObjResp("true");
+                        }else {
+                            return doObjResp("false");
+                        }
+                    }else {
+                        return faild("参数缺失~",false);
+                    }
+                }catch (Exception e){
+                    e.printStackTrace();
+                    return faild("失败~",false);
+                }
         }
         return null;
     }
@@ -521,13 +631,24 @@ public class CirclesController extends BaseController {
 
     /*
     *
-    * 根据用户id获取关注过的圈子（收藏）
+    * 根据用户id获取关注过的圈子（收藏）(title含有全部)
     * */
     @RequestMapping(value = "/getQuanZiByUid", method = {RequestMethod.GET,
             RequestMethod.POST}, produces = "application/json;charset=UTF-8")
     public JSONObject getQuanZiByUid(@RequestBody(required = false) String json) {
         return callHttpReqTask(json, 3);
     }
+
+    /*
+*
+* 根据用户id获取关注过的圈子（收藏）(title没有全部)
+* */
+    @RequestMapping(value = "/getNewQuanZiByUid", method = {RequestMethod.GET,
+            RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public JSONObject getNewQuanZiByUid(@RequestBody(required = false) String json) {
+        return callHttpReqTask(json, 13);
+    }
+
 
     /*
   *
@@ -615,4 +736,23 @@ public class CirclesController extends BaseController {
     }
 
 
+    /*
+    * 根据bid更新文化墙
+    *
+    * */
+    @RequestMapping(value = "/updateCulturewall", method = {RequestMethod.GET,
+            RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public JSONObject updateCulturewall(@RequestBody(required = false) String json) {
+        return callHttpReqTask(json, 14);
+    }
+
+    /*
+ * 判断是否为该圈子的圈主
+ *
+ * */
+    @RequestMapping(value = "/isQuanZhu", method = {RequestMethod.GET,
+            RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public JSONObject isQuanZhu(@RequestBody(required = false) String json) {
+        return callHttpReqTask(json, 15);
+    }
 }

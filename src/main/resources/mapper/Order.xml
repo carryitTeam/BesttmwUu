@@ -29,6 +29,27 @@
             <if test="uid != null">
                 uid,
             </if>
+            <if test="bid != null and bid !=0">
+                bid,
+            </if>
+            <if test="level != null">
+                level,
+            </if>
+            <if test="paysource != null">
+                paysource,
+            </if>
+            <if test="age != null">
+                age,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="phone != null">
+                phone,
+            </if>
+            <if test="sex != null">
+                sex,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -55,6 +76,27 @@
             <if test="uid != null">
                 #{uid},
             </if>
+            <if test="bid != null and bid !=0">
+                #{bid},
+            </if>
+            <if test="level != null">
+                #{level},
+            </if>
+            <if test="paysource != null">
+                #{paysource},
+            </if>
+            <if test="age != null">
+                #{age},
+            </if>
+            <if test="name != null">
+                #{name},
+            </if>
+            <if test="phone != null">
+                #{phone},
+            </if>
+            <if test="sex != null">
+                #{sex},
+            </if>
 
         </trim>
     </insert>
@@ -68,8 +110,13 @@
 
     <!--根据订单号查询订单-->
     <select id="queryOrder" resultType="com.carryit.base.besttmwuu.entity.Order">
-        select id,ordersn,price
+        select id,ordersn,price,level
         from
         ims_ewei_shop_order
+    </select>
+
+    <!--根据订单号查询订单-->
+    <select id="queryOrderCount" resultType="int">
+        select count(*) from ims_ewei_shop_order where bid=#{bid} and level=#{level} AND status='3'
     </select>
 </mapper>

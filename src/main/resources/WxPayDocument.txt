@@ -4,34 +4,29 @@
 请求地址：http://ip:port/wx/wxPay
 请求类型：POST
 请求参数：{
-     	"remoteAddrIP": "127.0.0.1", //用户端实际ip
-     	"productId": 9, //商品ID
+     	"productId": 14, //商品ID
      	"productNum":3,//商品数量
      	"uid":2 //下单用户ID
+     	"bid":12 //圈圈ID
      }
 响应结果：{
          "msg": "SUCCESS",
          "code": 200,
          "data": {
              "appid": "wx18c2cdc67528ee31",
-             "body": "小马UU-普通会员",
-             "fee_type": "CNY",
-             "mch_id": "1499854482",
-             "nonce_str": "CRupNPG5kMBCOsu0",
-             "notify_url": "http://localhost:8096/wx/notify",
-             "out_trade_no": "1538156303903",
-             "sign": "C5F237EBFA51AA4D21F62941D59282E2",
-             "spbill_create_ip": "127.0.0.1",
-             "total_fee": 300,
-             "trade_type": "APP"
+             "noncestr": "wVwcSWlIFAuGfTpO",
+             "packageValue": "Sign=WXPay",
+             "partnerid": "1514027471",
+             "prepayid": "wx1916290681461480724d573d0135647023",
+             "sign": "6C253F4B502B6C6C3412B4663E09A1CA",
+             "timestamp": 1539937746
          }
      }
 
-2、微信充值、提现接口
+2、微信充值
 请求地址：http://ip:port/wx/wxRecharge
 请求类型：POST
 请求参数：{
-     	"remoteAddrIP": "127.0.0.1", //用户端实际ip
      	"uid":2, //充值/提现用户ID
      	"money":3,//充值金额
      	"type":"Y" //充值类型  Y 充值  N 提现
@@ -42,15 +37,80 @@
          "code": 200,
          "data": {
              "appid": "wx18c2cdc67528ee31",
-             "body": "小马UU-用户充值",
-             "fee_type": "CNY",
-             "mch_id": "1514027471",
-             "nonce_str": "qXn75GMrjj2pCJeE",
-             "notify_url": "http://xm.besttmw.com/besttmwuu-0.0.1/wx/rechargeNotify",
-             "out_trade_no": "2_1539613741938",
-             "sign": "0D59558BE4B27F27CDE6840476A94403",
-             "spbill_create_ip": "127.0.0.1",
-             "total_fee": 300,
-             "trade_type": "APP"
+             "noncestr": "S4sb0Qc3q0yT5Wpn",
+             "packageValue": "Sign=WXPay",
+             "partnerid": "1514027471",
+             "prepayid": "wx19162615113383eb599e03f00273157563",
+             "sign": "90A1587A3DC0462F036013F972A46307",
+             "timestamp": 1539937581
          }
      }
+
+3、微信打赏
+请求地址：http://ip:port/wx/wxReward
+请求类型：POST
+请求参数：{
+     	"fuid":23, //打赏用户ID
+     	"money":3,//打赏金额
+     	"tuid":4 //被打赏用户ID
+
+     }
+响应结果：{
+         "msg": "SUCCESS",
+         "code": 200,
+         "data": {
+             "appid": "wx18c2cdc67528ee31",
+             "noncestr": "R1c4yNRrJEsfqcFd",
+             "packageValue": "Sign=WXPay",
+             "partnerid": "1514027471",
+             "prepayid": "wx1916295546801796e0cc8eed0445385439",
+             "sign": "B9713384E17EC4B61DCE7DDF1C7B1B11",
+             "timestamp": 1539937795
+         }
+     }
+
+4、微信活动报名支付
+请求地址：http://ip:port/wx/wxEntered
+请求类型：POST
+{
+
+		"uid":288,
+		"aid":24,
+		"age":24,
+		"name":111,
+		"phone":18772384740,
+		"sex":1
+     }
+响应结果：{
+         "msg": "SUCCESS",
+         "code": 200,
+         "data": {
+             "appid": "wx18c2cdc67528ee31",
+             "noncestr": "R1c4yNRrJEsfqcFd",
+             "packageValue": "Sign=WXPay",
+             "partnerid": "1514027471",
+             "prepayid": "wx1916295546801796e0cc8eed0445385439",
+             "sign": "B9713384E17EC4B61DCE7DDF1C7B1B11",
+             "timestamp": 1539937795
+         }
+     }
+
+ 4、微信提现
+ 请求地址：http://ip:port/wx/getCash
+ 请求类型：POST
+ 请求参数：{
+           	"uid": 10, //提现用户ID
+           	"money":0.01 //提现金额
+           }
+ 响应结果：{
+          "msg": "SUCCESS",
+          "code": 200,
+          "data": {
+              "mch_appid": "wxec38b8ff840bd989",
+              "mchid": "10013274",
+              "nonce_str": "lxuDzMnRjpcXzxLx0q",
+              "partner_trade_no": "10013574201505191526582441",
+              "payment_no": "1000018301201505190181489473",
+              "payment_time": "2015-05-19 15：26：59"
+          }
+      }

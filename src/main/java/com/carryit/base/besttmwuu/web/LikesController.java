@@ -1,9 +1,18 @@
 package com.carryit.base.besttmwuu.web;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
+import com.alibaba.fastjson.JSON;
+import com.bean.Page;
 import com.bean.req.TredsReq;
+import com.carryit.base.besttmwuu.entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +26,6 @@ import com.base.BaseController;
 import com.bean.req.BoardReq;
 import com.bean.req.CommentReq;
 import com.bean.req.PraiseReq;
-import com.carryit.base.besttmwuu.entity.ImsEweiShopSnsPostWithBLOBs;
-import com.carryit.base.besttmwuu.entity.TPraise;
 import com.carryit.base.besttmwuu.service.ImsEweiShopSnsPostService;
 import com.carryit.base.besttmwuu.service.LikeService;
 import com.carryit.base.besttmwuu.service.PraiseService;
@@ -71,6 +78,18 @@ public class LikesController extends BaseController {
         return callHttpReqTask(json, 3);
     }
 
+    //查询动态接口
+    @RequestMapping(value = "/getTreds", method = {RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public JSONObject getTreds(@RequestBody(required = false) String json) {
+        return callHttpReqTask(json, 4);
+    }
+
+    //查询动态接口
+    @RequestMapping(value = "/delTreds", method = {RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public JSONObject delTreds(@RequestBody(required = false) String json) {
+        return callHttpReqTask(json, 5);
+    }
+
 
     @Override
     public JSONObject runTask(String json, int cmd) {
@@ -81,10 +100,15 @@ public class LikesController extends BaseController {
                     if (req!=null) {
     //                    likeService.saveCreditNumber(req.uid);
     //                	签到
-                        signInService.sign(req.uid, LocalDateTime.now());
-                        return doObjRespSuccess("签到成功");
+                        boolean sign = signInService.sign(req.uid, LocalDateTime.now());
+                        if(sign){
+                            return doObjRespSuccess("签到成功");
+                        }else {
+                            return faild("您今天已经签到了哟~", false);
+                        }
+
                     } else {
-                        return faild("失败~", false);
+                        return faild("失败，参数异常~", false);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -93,7 +117,7 @@ public class LikesController extends BaseController {
             case 1:
                 try {
                     PraiseReq pReq = p(json, PraiseReq.class);
-                    if(pReq!=null){
+                    if(pReq!=null&&pReq.id!=0&&pReq.uid!=0){
     //                    userPostService.updateFabulousByUid(breq.uid);
                         if("0".equals(pReq.getFabulous())){
                             praiseService.deletepraise(pReq.id,pReq.uid);
@@ -123,9 +147,8 @@ public class LikesController extends BaseController {
                         ImsEweiShopSnsPostWithBLOBs imsEweiShopSnsPostWithBLOBs = new ImsEweiShopSnsPostWithBLOBs();
                         imsEweiShopSnsPostWithBLOBs.setPid(commentReq.getPid());
                         imsEweiShopSnsPostWithBLOBs.setUid(commentReq.getUid());
-                        //imsEweiShopSnsPostWithBLOBs.setBid(commentReq.getBid());
-                        imsEweiShopSnsPostWithBLOBs.setContent(commentReq.getContent());
-    //                	保存
+                        imsEweiShopSnsPostWithBLOBs.setContent(URLEncoder.encode(commentReq.getContent(), "utf-8"));
+                        //保存
                         postService.addOne(imsEweiShopSnsPostWithBLOBs);
                         return doObjRespSuccess("评论成功");
                     }else {
@@ -141,10 +164,9 @@ public class LikesController extends BaseController {
                     TredsReq tredsReq = p(json, TredsReq.class);
                     if(tredsReq!=null){
                         ImsEweiShopSnsPostWithBLOBs imsEweiShopSnsPostWithBLOBs = new ImsEweiShopSnsPostWithBLOBs();
-
                         imsEweiShopSnsPostWithBLOBs.setUid(tredsReq.getUid());
                         imsEweiShopSnsPostWithBLOBs.setBid(tredsReq.getBid());
-                        imsEweiShopSnsPostWithBLOBs.setContent(tredsReq.getContent());
+                        imsEweiShopSnsPostWithBLOBs.setContent(URLEncoder.encode(tredsReq.getContent(), "utf-8"));
                         imsEweiShopSnsPostWithBLOBs.setImages(tredsReq.getImage());
     //                	保存
                         postService.addTreds(imsEweiShopSnsPostWithBLOBs);
@@ -152,6 +174,86 @@ public class LikesController extends BaseController {
                     }else {
                         return faild("失败~", false);
                     }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return faild("失败~", false);
+                }
+
+            case 4:
+                    //根据uid查询动态
+                try {
+                    BoardManage tredsReq = p(json, BoardManage.class);
+                    List<TrendsData> newTrendsDataList = new ArrayList<>();
+                    long count = 0;
+                    if(tredsReq!=null){
+                        //                	保存
+                       List<Post> tredsReqList = postService.getTredsList(tredsReq.getUid(),(tredsReq.getPageStart() - 1) * tredsReq.getPageSize(), tredsReq.getPageSize());
+                        if(tredsReqList!=null&&tredsReqList.size()>0){
+                            for (Post post:tredsReqList) {
+                                TrendsData newTrendsData = new TrendsData();
+                                if(post.getContent()!=null){
+                                    post.setContent(URLDecoder.decode(post.getContent(), "utf-8"));
+                                }
+                                //根据动态查评论
+                                List<Post> newCommentList = postService.getcommentBypid(post.getId());
+                                if(newCommentList!=null&&newCommentList.size()>0){
+                                    for (Post po:newCommentList) {
+                                        po.setContent(URLDecoder.decode(po.getContent(), "utf-8"));
+                                    }
+                                }
+
+                                //查找点赞数
+                                long newPraiseCount  = praiseService.getPraiseCount(post.getId());
+                                //点赞头像
+                                List<String> newAvatarList = praiseService.getPraiseImage(post.getId());
+                                //查询当前动态当前用户是否点赞
+                                TPraise pr = praiseService.getPraise(tredsReq.getUid(),post.getId());
+                                if(pr==null){
+                                    post.setFabulous(0);//没有点赞
+                                }else {
+                                    post.setFabulous(1);//已经点赞
+                                }
+                                newTrendsData.setPost(post);
+                                newTrendsData.setCommentList(newCommentList);
+                                newTrendsData.setPraiseCount(newPraiseCount);
+                                newTrendsData.setAvatarList(newAvatarList);
+                                newTrendsDataList.add(newTrendsData);
+                                if(post.getCreatetime()!=0){
+                                    SimpleDateFormat fm = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+                                    String date = fm.format(new Date(post.getCreatetime()));
+                                    post.setCreateDate(date);
+                                }
+                                if(post.getImage()!=null){
+                                    List<String> result = Arrays.asList(post.getImage().split(","));
+                                    post.setImageList(result);
+                                }
+                            }
+                            count =  postService.getTredsCount(tredsReq.getUid());
+                        }
+                        Page page = new Page();
+                        page.setList(newTrendsDataList);
+                        page.setPageSize(tredsReq.getPageSize());
+                        page.setTotalSize(count);
+                       return doObjResp(page);
+                    }else {
+                        return faild("参数异常~", false);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return faild("失败~", false);
+                }
+
+            case 5:
+//            	删除动态
+                try {
+                    JSONObject parmJo = JSON.parseObject(json);
+                    if (!parmJo.containsKey("id")) { //用户ID
+                        return faild("参数异常~", false);
+                    }
+
+                        postService.delTreds(parmJo.getInteger("id"));
+                        return doObjRespSuccess("删除成功");
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     return faild("失败~", false);

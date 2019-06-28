@@ -1,13 +1,21 @@
 package com.carryit.base.besttmwuu.entity;
 
-import com.bean.Domain;
-
 import java.io.Serializable;
 
 public class User implements Serializable {
     private Integer uid;
 
     private String userName;    //姓名
+
+    private String salt;//盐值
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
+    }
 
     private String password;   //密码
 
@@ -29,13 +37,51 @@ public class User implements Serializable {
 
     private String mailbox;//公司邮箱
 
-    private String  isSingle; //是否单身
-
     private String marriage;//婚否
 
     private String services;//提供服务
 
     private String sex;//性别
+
+    private int bid;
+
+    private Integer hidePhone;//隐藏手机号码
+
+    private Integer hideSincerity;//隐藏诚信值
+
+    private String iCode;//邀请码
+
+    public Integer getHidePhone() {
+        return hidePhone;
+    }
+
+    public void setHidePhone(Integer hidePhone) {
+        this.hidePhone = hidePhone;
+    }
+
+    public Integer getHideSincerity() {
+        return hideSincerity;
+    }
+
+    public void setHideSincerity(Integer hideSincerity) {
+        this.hideSincerity = hideSincerity;
+    }
+
+    public String getiCode() {
+        return iCode;
+    }
+
+    public void setiCode(String iCode) {
+        this.iCode = iCode;
+    }
+
+    public int getBid() {
+        return bid;
+    }
+
+    public void setBid(int bid) {
+        this.bid = bid;
+    }
 
     public Integer getUid() {
         return uid;
@@ -45,20 +91,28 @@ public class User implements Serializable {
         this.uid = uid;
     }
 
-    public String getCorporateName() {
-        return corporateName;
+    public String getUserName() {
+        return userName;
     }
 
-    public void setCorporateName(String corporateName) {
-        this.corporateName = corporateName;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 
-    public String getMailbox() {
-        return mailbox;
+    public String getPassword() {
+        return password;
     }
 
-    public void setMailbox(String mailbox) {
-        this.mailbox = mailbox;
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
     }
 
     public String getIdCard() {
@@ -85,6 +139,22 @@ public class User implements Serializable {
         this.address = address;
     }
 
+    public String getCompanyProfile() {
+        return companyProfile;
+    }
+
+    public void setCompanyProfile(String companyProfile) {
+        this.companyProfile = companyProfile;
+    }
+
+    public String getCorporateName() {
+        return corporateName;
+    }
+
+    public void setCorporateName(String corporateName) {
+        this.corporateName = corporateName;
+    }
+
     public String getNeed() {
         return need;
     }
@@ -101,52 +171,12 @@ public class User implements Serializable {
         this.education = education;
     }
 
-    public String getIsSingle() {
-        return isSingle;
+    public String getMailbox() {
+        return mailbox;
     }
 
-    public void setIsSingle(String isSingle) {
-        this.isSingle = isSingle;
-    }
-
-    public Integer getId() {
-        return uid;
-    }
-
-    public void setId(Integer uid) {
-        this.uid = uid;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName == null ? null : userName.trim();
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password == null ? null : password.trim();
-    }
-
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
-    }
-
-    public String getCompanyProfile() {
-        return companyProfile;
-    }
-
-    public void setCompanyProfile(String companyProfile) {
-        this.companyProfile = companyProfile;
+    public void setMailbox(String mailbox) {
+        this.mailbox = mailbox;
     }
 
     public String getMarriage() {

@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.bean.Page;
 import com.carryit.base.besttmwuu.dao.CirclesDao;
+import com.carryit.base.besttmwuu.entity.Board;
 import com.carryit.base.besttmwuu.entity.Circles;
+import com.carryit.base.besttmwuu.entity.Culturewall;
 import com.carryit.base.besttmwuu.service.CirclesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,10 +38,8 @@ public class CirclesServiceImpl implements CirclesService {
             int pageSize = Integer.valueOf(subJo.getString("pageSize")); //每页数量
             int pageIndex = Integer.valueOf(subJo.getString("pageIndex")); //当前页
 
-            int index = pageIndex >1 ? pageSize * (pageIndex-1) +1 : pageIndex;
-            int size = index == 0 ? pageSize: pageIndex * pageSize;
-
-            List<Circles> list = circlesDao.getCirclesInfo(title,index,size);
+            int index = pageSize*(pageIndex-1);
+            List<Circles> list = circlesDao.getCirclesInfo(title,index,pageSize);
             jo.put("msg","请求成功");
             jo.put("code",200);
             jo.put("data",list == null ? "":list);
@@ -47,6 +47,11 @@ public class CirclesServiceImpl implements CirclesService {
         }
 
         return jo;
+    }
+
+    @Override
+    public void updateCulturewallByBid(Culturewall culturewall) {
+        circlesDao.updateCulturewallByBid(culturewall);
     }
 
 

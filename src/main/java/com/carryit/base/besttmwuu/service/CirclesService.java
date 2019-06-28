@@ -1,7 +1,9 @@
 package com.carryit.base.besttmwuu.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.carryit.base.besttmwuu.entity.Board;
 import com.carryit.base.besttmwuu.entity.Circles;
+import com.carryit.base.besttmwuu.entity.Culturewall;
 
 import java.util.List;
 
@@ -16,4 +18,6 @@ public interface CirclesService {
      * @return 圈子集合
      */
     JSONObject getCirclesInfo(String json);
+
+    void updateCulturewallByBid(Culturewall culturewall);
 }

@@ -13,13 +13,19 @@
 	<select id="selectByPrimaryKey" resultType="com.carryit.base.besttmwuu.entity.User"
 		>
 		select
-		uid,phone
+		uid,phone,hideSincerity
 		from ims_users
 		where uid = #{uid}
 	</select>
+	<!--后台登录用户匹配数据库-->
+	<select id="getUserByPoneAndPassword" resultType="com.carryit.base.besttmwuu.entity.User">
+
+		SELECT * from ims_users where phone=#{phone} or username = #{phone}
 
 
-	<insert id="insertSelective" parameterType="com.carryit.base.besttmwuu.entity.User">
+	</select>
+
+	<insert id="insertSelective" parameterType="com.carryit.base.besttmwuu.entity.User" useGeneratedKeys="true" keyProperty="uid" keyColumn="uid">
 		insert into ims_users
 		<trim prefix="(" suffix=")" suffixOverrides=",">
 
@@ -41,7 +47,7 @@
 			<if test="address != null">
 				address,
 			</if>
-			<if test="speciality != null">
+			<if test="companyProfile != null">
 				companyProfile,
 			</if>
 			<if test="need != null">
@@ -50,24 +56,24 @@
 			<if test="education != null">
 				education,
 			</if>
-			<if test="isSingle != null">
-				isSingle,
-			</if>
 			<if test="mailbox != null">
 				mailbox,
 			</if>
 			<if test="corporateName != null">
 				corporateName,
 			</if>
-			<if test="corporateName != null">
+			<if test="marriage != null">
 				marriage,
 			</if>
-			<if test="corporateName != null">
+			<if test="services != null">
 				services,
 			</if>
-			<if test="corporateName != null">
+			<if test="sex != null">
 				sex,
-		</if>
+			</if>
+			<if test="iCode != null">
+				iCode,
+			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
 
@@ -89,7 +95,7 @@
 			<if test="address != null">
 				#{address,jdbcType=VARCHAR},
 			</if>
-			<if test="speciality != null">
+			<if test="companyProfile != null">
 				#{companyProfile,jdbcType=VARCHAR},
 			</if>
 			<if test="need != null">
@@ -98,23 +104,23 @@
 			<if test="education != null">
 				#{education,jdbcType=VARCHAR},
 			</if>
-			<if test="isSingle != null">
-				#{isSingle,jdbcType=VARCHAR},
-			</if>
 			<if test="mailbox != null">
 				#{mailbox,jdbcType=VARCHAR},
 			</if>
 			<if test="corporateName != null">
 				#{corporateName,jdbcType=VARCHAR},
 			</if>
-			<if test="corporateName != null">
+			<if test="marriage != null">
 				#{marriage,jdbcType=VARCHAR},
 			</if>
-			<if test="corporateName != null">
+			<if test="services != null">
 				#{services,jdbcType=VARCHAR},
 			</if>
-			<if test="corporateName != null">
+			<if test="sex != null">
 				#{sex,jdbcType=VARCHAR},
+			</if>
+			<if test="iCode != null">
+				#{iCode,jdbcType=VARCHAR},
 			</if>
 		</trim>
 	</insert>
@@ -141,7 +147,7 @@
 			<if test="address != null">
 				address=#{address},
 			</if>
-			<if test="speciality != null">
+			<if test="companyProfile != null">
 				companyProfile=#{companyProfile},
 			</if>
 			<if test="need != null">
@@ -150,9 +156,6 @@
 			<if test="education != null">
 				education=#{education},
 			</if>
-			<if test="isSingle != null">
-				isSingle=#{isSingle},
-			</if>
 			<if test="mailbox != null">
 				mailbox=#{mailbox},
 			</if>
@@ -160,13 +163,13 @@
 				corporateName=#{corporateName},
 			</if>
 			<if test="marriage != null">
-				corporateName=#{corporateName},
+				marriage=#{marriage},
 			</if>
 			<if test="services != null">
-				corporateName=#{corporateName},
+				services=#{services},
 			</if>
 			<if test="sex != null">
-				corporateName=#{corporateName},
+				sex=#{sex},
 			</if>
 		</set>
 		where uid = #{uid,jdbcType=INTEGER}
@@ -193,4 +196,10 @@
 		password = #{password}
 		where phone = #{phone}
 	</update>
+
+	<!--通过ID查-->
+	<select id="getUserById" resultType="com.carryit.base.besttmwuu.entity.User">
+		select * from ims_users where uid = #{id}
+
+	</select>
 </mapper>

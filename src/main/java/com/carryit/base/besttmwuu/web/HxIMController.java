@@ -35,7 +35,27 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
+            return jo;
+
+        }
+    }
+
+    /**
+     * 重置IM用户密码
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/resetPassword", method = {RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public ResultPojo resetPassword(@RequestBody(required = false) String json) {
+        try {
+            return  hximService.resetPassword(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResultPojo jo = new ResultPojo();
+            jo.setCode(2);
+            jo.setMsg("失败");
+            jo.setData("");
             return jo;
 
         }
@@ -55,7 +75,26 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
+            return jo;
+        }
+    }
+
+    /**
+     * 获取--单个用户|批量用户
+     * @param json
+     * @return
+     */
+    @RequestMapping(value = "/getUser", method = {RequestMethod.POST}, produces = "application/json;charset=UTF-8")
+    public ResultPojo getUser(@RequestBody(required = false) String json) {
+        try {
+            return  hximService.getUser(json);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ResultPojo jo = new ResultPojo();
+            jo.setCode(2);
+            jo.setMsg("失败");
+            jo.setData("");
             return jo;
         }
     }
@@ -74,7 +113,7 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
             return jo;
         }
 
@@ -94,7 +133,7 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
             return jo;
         }
     }
@@ -114,7 +153,7 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
             return jo;
         }
     }
@@ -133,7 +172,7 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
             return jo;
         }
     }
@@ -152,7 +191,7 @@ public class HxIMController {
             ResultPojo jo = new ResultPojo();
             jo.setCode(2);
             jo.setMsg("失败");
-            jo.setData(null);
+            jo.setData("");
             return jo;
         }
     }

@@ -5,15 +5,19 @@ import com.alibaba.fastjson.JSONObject;
 import com.base.ResultPojo;
 import com.bean.RegisterReq;
 import com.carryit.base.besttmwuu.dao.UserDao;
+import com.carryit.base.besttmwuu.entity.Member;
 import com.carryit.base.besttmwuu.entity.User;
 import com.carryit.base.besttmwuu.service.HximService;
+import com.carryit.base.besttmwuu.service.MemberService;
 import com.carryit.base.besttmwuu.service.UserService;
+import com.util.NameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Date;
 
 @Service("registerService")
 public class RegisterServiceImpl implements UserService {
@@ -23,6 +27,9 @@ public class RegisterServiceImpl implements UserService {
 
     @Autowired
     private HximService hximService;
+
+    @Autowired
+    private MemberService memberService;
 
 
     public User beiginRegister(RegisterReq req) {
@@ -44,8 +51,17 @@ public class RegisterServiceImpl implements UserService {
         boolean result = false;
         try {
             //注册到平台
-            userDao.insertSelective(record);
+            int uid = userDao.insertSelective(record);
 
+            //新增一条会员资料记录
+            Member member = new Member();
+            member.setNickName(NameUtil.getName());
+            member.setZhuquanzi(record.getBid());
+            member.setUid(record.getUid());
+            member.setCreatetime(new Date().getTime()+"");
+            member.setAvatar("http://47.105.163.51/besttmwuu-0.0.1/index_img/logo.jpg");
+            member.setLevel("5");
+            memberService.addMember(member);
             //同步注册到环信
             //1、获取环信token
             String token = null;
@@ -83,6 +99,11 @@ public class RegisterServiceImpl implements UserService {
         i = userDao.updatePassWord(phone, password);
         return i;
 
+    }
+
+    @Override
+    public User getUserByPoneAndPassword(String phone) {
+        return userDao.getUserByPoneAndPassword(phone);
     }
 
     public int updateUser(User newUser) {

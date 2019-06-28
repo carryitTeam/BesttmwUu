@@ -3,12 +3,20 @@ package com.carryit.base.besttmwuu.entity;
 import java.io.Serializable;
 
 public class UserDTO implements Serializable {
-
-    private String realName;  //名字
+    private Integer uid; //用户id
+    private String nickName;  //名字
     private String profilePhoto; //头像
     private String WealthValue; //财富值
-    private String sincerity; //诚信值
+    private int sincerity; //诚信值
     private Integer seq;
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
 
     public Integer getSeq() {
         return seq;
@@ -18,20 +26,20 @@ public class UserDTO implements Serializable {
         this.seq = seq;
     }
 
-    public String getSincerity() {
+    public int getSincerity() {
         return sincerity;
     }
 
-    public void setSincerity(String sincerity) {
+    public void setSincerity(int sincerity) {
         this.sincerity = sincerity;
     }
 
-    public String getRealName() {
-        return realName;
+    public String getNickName() {
+        return nickName;
     }
 
-    public void setRealName(String realName) {
-        this.realName = realName;
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
     }
 
     public String getProfilePhoto() {

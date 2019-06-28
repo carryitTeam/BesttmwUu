@@ -1,11 +1,14 @@
 package com.carryit.base.besttmwuu.entity;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class Post implements Serializable {
     private Integer id;
 
     private Integer bid;
+
+    private Integer uid;
 
     private String avatar;//头像
 
@@ -29,6 +32,23 @@ public class Post implements Serializable {
 
     private int fabulous;//点赞
 
+    private List<String> imageList;
+
+    public Integer getUid() {
+        return uid;
+    }
+
+    public void setUid(Integer uid) {
+        this.uid = uid;
+    }
+
+    public List<String> getImageList() {
+        return imageList;
+    }
+
+    public void setImageList(List<String> imageList) {
+        this.imageList = imageList;
+    }
 
     public Integer getId() {
         return id;
